@@ -10,17 +10,25 @@ function Timer() {
   const [started, setIsStarted] = useState(false);
 
   function arrowUpHandler(field) {
-    setTime((oldData) => ({
-      ...oldData,
-      [field]: oldData[field] + 1,
-    }));
+    setTime((oldData) => {
+      let updatedData = Number(oldData[field]) + 1;
+      updatedData = updatedData > 59 ? 0 : updatedData;
+      return {
+        ...oldData,
+        [field]: updatedData,
+      };
+    });
   }
+
   const handleInputChange = (field, newValue) => {
+    let clampedValue;
+
     const parsedValue = parseInt(newValue, 10);
     if (!isNaN(parsedValue)) {
+      clampedValue = Math.min(Math.max(parsedValue, 0), 59);
       setTime((prevInputValues) => ({
         ...prevInputValues,
-        [field]: parsedValue,
+        [field]: clampedValue,
       }));
     }
   };
@@ -72,6 +80,11 @@ function Timer() {
     return () => clearInterval(timer);
   }, [started]);
 
+  function resetHandler() {
+    setTime(initialState);
+    console.log("test");
+  }
+
   return (
     <>
       <section className={styles["clock-wrapper"]}>
@@ -117,8 +130,10 @@ function Timer() {
           <button type="button" onClick={() => setIsStarted(!started)}>
             {started ? "Pause" : "Start"}
           </button>
-          <button type="button">Stop</button>
-          <button type="button">Reset</button>
+
+          <button type="button" onClick={resetHandler}>
+            Reset
+          </button>
         </div>
       </section>
     </>
